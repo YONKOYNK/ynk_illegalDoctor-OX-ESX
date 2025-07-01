@@ -20,7 +20,7 @@ Ce script ajoute un PNJ soigneur illégal à votre serveur **FiveM**. Le joueur 
 1. Placez le dossier dans `resources/`
 2. Ajoutez à votre `server.cfg` :
    ```bash
-   ensure illegal_medical
+   ensure ynk_illegaldoctor
 
 ---
 
