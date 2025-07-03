@@ -11,6 +11,9 @@ RegisterNetEvent('applyHeal')
 AddEventHandler('applyHeal', function(pourcentage)
     local player = PlayerPedId()
     local currentHealth = GetEntityHealth(player)
+
+    lib.progressBar({ duration = 3000,label = 'Soin', useWhileDead = false,canCancel = true,disable = {car = true,}})
+
     SetEntityHealth(player, currentHealth + pourcentage)
     playerHealedEffect()
     print("Tu as été soigné de " .. pourcentage .. " %")
@@ -49,7 +52,7 @@ function payment(pourcentage, price)
 end
 
 function playerHealedEffect()
-  RequestAnimSet("move_m@drunk@verydrunk") 
+  RequestAnimSet("move_m@drunk@verydrunk")
 
   while not HasAnimSetLoaded("move_m@drunk@verydrunk") do
       Wait(10)
@@ -65,6 +68,9 @@ function playerHealedEffect()
   ResetPedStrafeClipset(PlayerPedId())
 
 end
+
+
+--illegal_medical
 
 lib.registerContext({
   id = 'illegal_medical',
@@ -99,7 +105,7 @@ lib.registerContext({
   }
 })
 
-Citizen.CreateThread(function ()
+
     local pedPosition = Config.pedPosition
 
     RequestModel(pedHash)
@@ -107,23 +113,19 @@ Citizen.CreateThread(function ()
         Wait(0)
     end
 
-    if not pedSpawned then
-        createdPed = CreatePed(4, pedHash, pedPosition.x, pedPosition.y, pedPosition.z - 1.0, 0.0, false, true)
-        SetEntityInvincible(createdPed, true)
-        FreezeEntityPosition(createdPed, true)
-        TaskStartScenarioInPlace(createdPed, "WORLD_HUMAN_CLIPBOARD", 0, true)
-        pedSpawned = true
-    end
+    createdPed = CreatePed(4, pedHash, pedPosition.x, pedPosition.y, pedPosition.z - 1.0, 0.0, false, true)
+    SetEntityInvincible(createdPed, true)
+    FreezeEntityPosition(createdPed, true)
+    TaskStartScenarioInPlace(createdPed, "WORLD_HUMAN_CLIPBOARD", 0, true)
 
-    while true do
-        Wait(0)
-        local playerPos = GetEntityCoords(player)
-        if  not IsEntityDead(player) and not IsPedInAnyVehicle(player, false)  then
-            local distance = GetDistanceBetweenCoords(playerPos.x, playerPos.y, playerPos.z, pedPosition.x, pedPosition.y, pedPosition.z)
-            if distance <= 2  and  IsControlJustPressed(0, Config.touche) then
-              lib.progressCircle({duration = 3000, position = 'bottom', useWhileDead = false, canCancel = true, anim = {dict = 'misscarsteal4@actor', clip = 'actor_berating_loop'}})
-              lib.showContext('illegal_medical')
-            end
+exports.ox_target:addLocalEntity(createdPed, {
+    {
+        name = 'open_drug_menu',
+        icon = 'fas fa-capsules',
+        label = 'Parler au docteur',
+        distance = 2.0,
+        onSelect = function(data)
+            lib.showContext("illegal_medical")
         end
-    end
-end)
+    }
+})
